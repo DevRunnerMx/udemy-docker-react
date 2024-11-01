@@ -13,3 +13,15 @@ jobs:
       - run: docker build -t coderocker/my-react-test -f Dockerfile.dev .
       - run: docker run -e CI=true coderocker/my-react-test npm test
 
+      - name: Generate deployment package
+        run: zip docker-react-deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: coderocker/beanstalk-deploy@v18
+        with:
+          application_name: docker-gh
+          environment_name: Dockergh-env
+          existing_bucket_name: elasticbeanstalk-us-east-1-445567107096
+          region: us-east-1
+          version_label: ${{ github.sha }}
+          deployment_package: docker-react-deploy.zip
