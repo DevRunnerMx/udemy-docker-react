@@ -8,13 +8,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD}}
       - run: docker build -t coderocker/my-react-test -f Dockerfile.dev .
       - run: docker run -e CI=true coderocker/my-react-test npm test
 
       - name: Generate deployment package
-        run: zip -r docker-react-deploy.zip . -x '*.git*'
+        run: zip -r deploy.zip . -x '*.git*'
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
@@ -26,4 +26,4 @@ jobs:
           existing_bucket_name: elasticbeanstalk-us-east-1-445567107096
           region: us-east-1
           version_label: ${{ github.sha }}
-          deployment_package: docker-react-deploy.zip
+          deployment_package: deploy.zip
